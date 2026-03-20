@@ -1,0 +1,468 @@
+---
+title: Soil properties and sediment accretion modulate methane fluxes from restored
+  wetlands
+author: Samuel D Chamberlain^1^, Tyler Anthony^1^, Whendee L Silver^1^, Elke Eichelmann^1^,
+  Kyle S Hemes^1^, Patricia Y Oikawa^2^, Cove Sturtevant^3^, Daphne J Szutu^1^, Joseph
+  G Verfaillie^1^, and Dennis D Baldocchi^1^
+date: '`r Sys.Date()`'
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+fontsize: 12pt
+header-includes:
+- \usepackage{setspace}
+- \doublespacing
+- \usepackage{lineno}
+- \linenumbers
+- \usepackage{hyperref}
+link-citations: true
+csl: global-change-biology.csl
+bibliography: library.bib
+---
+
+^1^Department of Environmental Science, Policy, and Management, University of California, Berkeley, California, USA
+
+^2^Department of Earth and Environmental Sciences, California State University, East Bay, Hayward, California, USA
+
+^3^National Ecological Observatory Network, Battelle, Boulder, Colorado, USA
+
+**Running Head**: Wetland CH~4~ emission and soil interactions
+
+**Keywords**: eddy covariance, greenhouse gas balance, carbon flux, peatland, redox, alternative electron acceptor, Sacramento-San Joaquin Delta, information theory
+
+**Type of Paper**: Primary research article
+
+```{r setup, include=FALSE}
+#setwd to main package directory
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+options(digits=2)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>")
+
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
+```
+
+```{r packages, message=FALSE}
+library(knitr)
+library(tidyverse)
+library(lubridate)
+library(gridExtra)
+library(scales)
+library(zoo)
+library(ggpubr)
+library(caret)
+library(modelr)
+```
+
+\newpage
+
+# Abstract
+Wetlands are the largest source of methane (CH~4~) globally, yet our understanding of how process-level controls scale to ecosystem fluxes remains limited. It is particularly uncertain how variable soil properties influence ecosystem CH~4~ emissions on annual time scales. We measured ecosystem carbon dioxide (CO~2~) and CH~4~ fluxes by eddy covariance from two wetlands recently restored on peat and alluvium soils within the Sacramento-San Joaquin Delta of California. Annual CH~4~ fluxes from the alluvium wetland were significantly lower than the peat site for multiple years following restoration, but these differences were not explained by variation in dominant climate drivers or productivity across wetlands. Soil iron (Fe) concentrations were significantly higher in alluvium soils, and alluvium CH~4~ fluxes were decoupled from plant processes compared to the peat site, as expected when Fe reduction inhibits CH~4~ production in the rhizosphere. Soil carbon content and CO~2~ uptake rates did not vary across wetlands and thus could also be ruled out as drivers of initial CH~4~ flux differences. Differences in wetland CH~4~ fluxes across soil types were transient; alluvium wetland fluxes were similar to peat wetland fluxes three years after restoration. Changing alluvium CH~4~ emissions with time could not be explained by an empirical model based on dominant CH~4~ flux biophysical drivers, suggesting that other factors, not measured by our eddy covariance towers, were responsible for these changes. Recently accreted alluvium soils were less acidic and contained more reduced Fe compared to the pre-restoration parent soils, suggesting that CH~4~ emissions increased as conditions became more favorable to methanogenesis within wetland sediments. This study suggests that alluvium soil properties, likely Fe content, are capable of inhibiting ecosystem-scale wetland CH~4~ flux, but these effects appear to be transient without continued input of alluvium to wetland sediments.
+
+\newpage
+
+# Introduction
+Wetlands play a fundamental role in regulating global climate and are important biogeochemical hotspots, as they store ~18% of Earth's soil carbon (C) [@lal_carbon_2008], emit ~30% of global methane (CH~4~) emissions [@kirschke_three_2013; @saunois_global_2016], while only occupying 5-8% of the terrestrial land surface [@mitsch_wetlands_2013]. Most wetlands are greenhouse gas (GHG) sinks over multi-century time scales due to carbon dioxide (CO~2~) sequestration within anoxic soils, though they are commonly GHG sources over shorter time scales due to the high global warming potential of CH~4~ they emit [@whiting_greenhouse_2001; @mitsch_wetlands_2013; @neubauer_moving_2015; @petrescu_uncertain_2015]. Wetland C sequestration and CH~4~ emissions are inextricably linked, as anoxic soil conditions inhibiting ecosystem respiration (*ER*) also activates archaeal CH~4~ production [@whalen_biogeochemistry_2005; @conrad_global_2009], though recent studies suggest significant CH~4~ production also occurs in the oxic zone [@angle_methanogenesis_2017]. The balance between these opposing fluxes primarily determines wetland GHG balances [@bubier_ecological_1994; @hendriks_full_2007; @petrescu_uncertain_2015], and small differences in sustained ecosystem CH~4~ emissions can induce large changes in wetland GHG exchange due to the > 45-fold radiative forcing of CH~4~ compared to CO~2~ over decadal to centennial time horizons [@neubauer_moving_2015]. Recent rises in atmospheric CH~4~ have been attributed to a global increase in wetland CH~4~ fluxes [@nisbet_rising_2016], and wetlands are currently the most uncertain component of the global CH~4~ budget [@kirschke_three_2013]. A key driver of this uncertainty is a lack of ecosystem-scale flux measurements to better constrain models and improve our understanding of how process-level controls scale to whole ecosystem CH~4~ emissions [@bridgham_methane_2013; @saunois_global_2016].
+
+Methane fluxes from wetlands are governed by many interacting biophysical drivers including temperature, C inputs, alternative electron acceptor pools, and water table depth [@bridgham_methane_2013]. It is uncertain how these governing factors interact and scale to whole ecosystem fluxes due to sparse global coverage of ecosystem-scale eddy covariance flux sites [@petrescu_uncertain_2015], where current measurement campaigns may under-sample relevant environmental gradients. Chamber flux syntheses have demonstrated that water table depth, temperature, vegetation, disturbance, and wetland type are important modulators of wetland CH~4~ flux [@turetsky_synthesis_2014]. A similar understanding of the controls on CH~4~ fluxes is emerging from eddy covariance studies, where temperature [@rinne_annual_2007; @wille_methane_2008; @hendriks_multi-technique_2010; @olson_interannual_2013; @chu_net_2014], recent C inputs [@hatala_gross_2012; @morin_environmental_2014], wetland structure [@matthes_parsing_2014; @mcnicol_effects_2017], vegetation cover [@morin_combining_2017; @rey-sanchez_determining_2017] and water table depth [@hendriks_full_2007; @hendriks_multi-technique_2010; @brown_evidence_2014; @goodrich_overriding_2015; @chamberlain_underlying_2015; @chamberlain_influence_2016; @sturtevant_identifying_2016; @chamberlain_impact_2017] have been identified as dominant controls across many wetland ecosystems. Combined chamber and eddy covariance studies have further improved our understanding of how drivers of small-scale flux variation scale to ecosystem fluxes [@forbrich_cross-evaluation_2011; @morin_combining_2017; @rey-sanchez_determining_2017]. 
+
+Small-scale field and laboratory studies have also demonstrated the influence of soil C content [@levy_methane_2012; @bridgham_methane_2013; @ye_soil_2016] and alternative electron acceptor pools, such as sulfate and ferric iron, on wetland CH~4~ fluxes [@laanbroek_methane_2010; @poffenbarger_salinity_2011; @bridgham_methane_2013; @miller_methane_2015]. Recently, @holm_ecosystem_2016 and @krauss_component_2016 used eddy covariance to observe reductions in coastal wetland CH~4~ fluxes with increasing salinity, speculatively due to sulfate redox inhibition of methanogenesis [@poffenbarger_salinity_2011], demonstrating how redox conditions can modulate annual CH~4~ emissions. Iron (Fe) minerals can also inhibit CH~4~ production and emissions [@laanbroek_methane_2010], as observed in many laboratory and field studies [@jackel_suppression_2000; @neubauer_seasonal_2005; @teh_suppression_2008; @ali_silicate_2009; @zhou_methanogenesis_2014], though Fe inhibition to long-term ecosystem fluxes has not been documented by eddy covariance. Understanding the interactions between soil properties, such as Fe content, and CH~4~ emissions may be particularly important to upscaling and modeling fluxes across complex, heterogeneous landscapes, such as river deltas or the tropics, the largest source of the global wetland CH~4~ emissions [@kirschke_three_2013], where high Fe concentrations influence rates of organic matter decomposition and CH~4~ production [@teh_suppression_2008; @dubinsky_tropical_2010; @hall_iron_2013].
+
+Wetland restoration and management programs have increasingly been proposed and implemented to mitigate climate change [@mitsch_creating_1998; @mitsch_wetlands_2013], and restoration strategies that minimize CH~4~ emissions and maximize CO~2~ uptake will provide the optimum climate benefit. These programs are particularly appealing in coastal ecosystems where CO~2~ sequestration rates are high and CH~4~ flux rates are low [@conservation_international_blue; @poffenbarger_salinity_2011], and in drained peatlands where large CO~2~ emissions from oxidizing peat can be reduced by re-flooding the landscape [@hatala_greenhouse_2012; @knox_agricultural_2015; @wilson_multiyear_2016]. A thorough understanding of CH~4~ flux drivers is essential to these programs because the magnitude of CH~4~ emissions may determine if restored wetlands are a GHG source or sink [@knox_agricultural_2015]. These emissions could affect funding of wetland restoration programs if financed through C markets alone [@oikawa_evaluation_2017], though wetlands provide a number of relevant ecosystem services, such as nutrient retention, protection from storms and sea-level rise, and habitat preservation for wildlife [@hansson_conflicting_2005; @zedler2005wetland; @swain_trade-offs_2013].
+
+The Sacramento-San Joaquin Delta region of California (hereafter referred to as the Delta) is an area where financing of wetland restoration through California's Cap and Trade program is being considered. The Delta is comprised of a network of artificially drained islands reclaimed for agriculture, where the water table is maintained below sea level by active pumping and levees surrounding each island. Drainage began in the 1850's to facilitate agricultural development, and exposure of the highly organic soils has led to substantial land surface subsidence [@deverel_historic_2010] and CO~2~ emissions [@hatala_greenhouse_2012; @knox_agricultural_2015], and wetland restoration efforts aim to accrete new sediments and reduce GHG emissions [@miller_subsidence_2008; @miller_carbon_2011; @hatala_greenhouse_2012]. Prior to drainage, this region was a 2990 km^2^ tidal marsh where soils varied substantially across space due to fluvial deposition from major rivers that carried mineral alluvium from the Sierra Nevada mountain range to the Delta marshes [@atwater1979history; @atwater1980tidal]. These differences in pre-drainage wetland geomorphology give rise to a contemporary agricultural landscape where large changes in soil C and mineral content occur over small spatial scales [@soilsurvey], but how this edaphic variation influences current GHG fluxes from restored wetlands is unknown. Understanding the importance of these soil legacy effects is highly desirable, as it would allow for more informed wetland restoration strategies where sites could be chosen to minimize GHG emissions.
+
+The objectives of this study were to (1) determine how soil properties and wetland GHG fluxes varied across wetlands restored on peat versus alluvium soils, (2) identify how relationships between biophysical drivers and CH~4~ fluxes varied across wetland types, and (3) determine the most likely drivers (climate v. edaphic) of observed flux differences. To meet these objectives, we measured ecosystem-scale CH~4~ and CO~2~ fluxes by eddy covariance from two recently restored wetlands, where one wetland was restored on peat soils while the other was restored on alluvium soils, and measured multiple soil properties within the tower footprints to identify potential edaphic drivers of observed flux differences. Soil properties were measured across two horizons as a proxy for time, and this depth for time assumption is valid because vertical accretion of new sediments in Sacramento-San Joaquin Delta wetlands has been documented using both feldspar marker [@miller_subsidence_2008] and radiocarbon dating methods [@drexler_peat_2009; @drexler_peat_2011]. We then used a combination of wavelet analysis and information theory to identify time scale-emergent biophysical drivers of wetland CH~4~ fluxes and how they varied across the wetlands. Once differences were established, we used an empirical biophysical CH~4~ flux model trained on an independent mature wetland to determine whether observed differences could be explained by common, non-edaphic biophysical drivers alone. These tower sites are ideal for identifying edaphic controls, as all wetlands sites have a similarly managed hydroperiod, are within 13 km of one another, experience the same climate, and have similar plant community compositions.
+
+# Materials and Methods
+## Site Description
+We measured wetland ecosystem CH~4~ and CO~2~ fluxes using a network of eddy covariance towers in the Sacramento-San Joaquin Delta region of California, USA. The Delta is located within a Mediterranean climate that experiences hot, dry summers and cooler, rainy winters. The mean annual temperature is 15.1 $^\circ$C (1998-2015 average), and the region receives 326 mm of rainfall annually [@knox_biophysical_2016]. All measurement sites were located on Sherman and Twitchell Islands in the northwest Delta. These islands are a mosaic of alluvium mollisols and highly organic peat histosols [@soilsurvey]. Alluvium marsh mollisols frequently developed adjacent to peat histosols that were spatially segregated from the main river channels [@atwater1979history; @atwater1980tidal]. Alluvium soils formed via fluvial deposition from major rivers and are most common on islands adjacent to the Sacramento River compared to the central and eastern Delta region where fluvial deposition was less pronounced [@deverel_historic_2010]. These alluvium soils tend to be high in Fe content, as the Sacramento River drains the northern Sierra Nevada range where Fe concentrations are particularly high compared to the central or south Sierra Nevada [@graham_soil_2010]. In contrast, peat histosols formed densely organic soils in areas less disturbed by fluvial input [@deverel_historic_2010]. The dominant mollisol series on these islands are Gazwell and Scribner (Fig. 1), both of which are formed in mixed alluvium, belong to the soil class Cumulic Endoaquolls, and are only found on Delta islands within the Sacramento River drainage [@soilsurvey]. Rindge is the major histosol series found on both islands (Fig. 1) and is widely distributed across the Delta region. Rindge soils belong to the  Typic Haplosaprists class, and are characterized by deep, poorly drained marsh soils formed from decomposed plant organic matter [@soilsurvey]. 
+
+Fluxes were measured from the time of initial restoration at two sites, where one wetland, hereafter referred to as the 'peat' site (Ameriflux site Us-Myb; N 38.0498, W 121.7650), was restored in 2010 from a pasture on peat Rindge soils (Fig. 1a). The other recently restored site, hereafter referred to as the 'alluvium' site (Ameriflux site US-Tw4; N 38.10275, W 121.64125), was restored in 2014 from a corn field on alluvium Scribner soils (Fig. 1b). We have also measured fluxes since 2013 from an older, mature wetland, hereafter referred to as the 'mature' site (Ameriflux site Us-Tw1; N 38.1074, W 121.6469), that was restored in 1999 on peat Rindge soils (Fig. 1b). A detailed description of tower instrumentation can be found in the Supplemental Materials. All sites are vegetated predominantly by cattails (*Typha* spp.), with few tules (*Schoenoplectus acutus*), and are actively managed to remain inundated year-round. Peat and alluvium sites were constructed to have heterogeneous bathymetry, providing channels of open water and areas of closed vegetation. The mature site is entirely closed vegetation and the ground surface is saturated plant detritus, whereas the recently restored peat and alluvium sites have standing water under the plant canopy. Given the large differences age and stand structure between the mature wetland and other sites, most comparisons made in this study are between the recently restored peat and alluvium sites that have similar bathymetry, stand structure, and measurement coverage across early successional periods. For a more detailed description of the peat and mature sites see @miller_carbon_2011, @matthes_parsing_2014, and @knox_agricultural_2015.
+
+Flux corrections and quality control were applied as described in detail in @knox_agricultural_2015 and @chamberlain_evaluation_2017, and included high-frequency data despiking, 2-D coordinate rotations, density corrections, and site-specific friction velocity (*u$^\ast$*) filtering. At the mature site, we reject fluxes from wind directions 290$^\circ$-240$^\circ$ because fluxes from these directions were from other wetland types; however, we did not apply wind direction filtering to the other sites where flux footprints were more homogeneous. Footprints at all sites were calculated using a two-dimensional analytical model [@detto_soil_2006; @hsieh_approximate_2000].
+
+We gap filled missing fluxes using artificial neural networks (ANNs), as described in detail in @knox_agricultural_2015. Briefly, we used single-layer, feed-forward ANNs with meteorological variables as inputs. Flux data without missing values were split into training, validation, and test sets (1/3 split), and we trained multiple ANN architectures with varying nodes per single hidden layer, keeping the simplest architecture where a more complex architecture led to a less than 5% reduction in root mean squared error. This process (including resampling training, validation, and test data) was repeated 20 times, and the median of the 20 ANN predictions was used to fill missing fluxes and the variance was used to estimate gap filling uncertainty. Separate ANNs were trained for daytime and nighttime CO~2~ fluxes, and the nighttime CO~2~ flux ANN was used to model *ER* at all times. Gross ecosystem photosynthesis (*GEP*) was then estimated as the difference between the gap-filled CO~2~ flux and modeled *ER* [@baldocchi_does_2015]. Our partitioning method performs well against independent verification methods in agricultural systems [@oikawa_revisiting_2017].
+
+![Soil type and tower flux footprints for (a) Sherman and (b) Twitchell Islands in the Sacramento-San Joaquin Delta of California. Tower footprints include wetland area only, and footprint rings, from largest to smallest, correspond to the 90, 85, 80, 70, and 50% cumulative flux footprints at each site. Tower footprints were calculated using a two-dimensional analytical model described in @detto_soil_2006. Site names are given next to their respective footprint.](fig1.png)
+
+## Soil Analyses
+We measured soil C, N, and Fe content at the three wetland sites in the recently accreted wetland O horizon, hereafter referred to as the accreted horizon, and the underlying pre-restoration parent soils, hereafter referred to as the parent horizon. Fifteen samples of both accreted and parent horizon soils were collected at each site across three transects, with each sampling location at least 3 m apart. The transects were within each tower's flux footprint, all samples were collected from fully inundated locations, and the accreted sample was collected directly above the underlying parent soil sample. At the peat and alluvium sites (both < 8 years old), the differentiation between these horizons was clear, as the recently accreted horizon was loose, mucky, and heavily comprised of poorly-decomposed plant matter, whereas the underlying parent horizon was compacted agricultural soil. At these sites, we collected the accreted horizon by hand (grab samples) and the top 15 cm of parent horizon using a sediment core. Our sampling strategy was different at the mature site because more than 0.5 m of O horizon had accumulated since initial restoration. Here, the accreted horizon reached the water surface, and we collected the top 2 cm of this horizon to represent the most recently accreted peat. We then bore holes through the 0.5-0.7 m saturated peat layer to collect the underlying parent soil horizon. Differentiation between these layers was also clear, as the top 0.5-0.7 m was comprised of poorly-decomposed plant matter and the underlying horizon was a silty clay loam. These observations are consistent with previously measured accretion rates and peat depths [@miller_subsidence_2008].
+
+All soil samples were immediately bagged, and sub-samples were extracted in the field with both 0.5 M HCl and 0.2 M sodium citrate/0.05 M sodium ascorbate solutions to measure HCl-extractable Fe (Fe^2+^ and Fe^3+^) and poorly crystalline Fe oxide pools, respectively. The HCl extraction solubilizes reactive Fe^3+^ minerals and absorbed/solid Fe^2+^, and is used to quantify oxidized (Fe^3+^) and reduced (Fe^2+^) Fe pools. The low pH of HCl prevents any Fe^2+^ oxidation after the samples are collected [@hall_reducing_2015]. Roughly 3 g of sample (dry mass equivalent) were immediately placed into preweighed bottles with the HCl solution, and once back in the lab, samples were reweighed, vortexed, shaken for 1 hour, and centrifuged for 10 minutes at 1000 rcf. Concentrations of Fe^2+^ and Fe^3+^ were measured colorimetrically using the ferrozine assay [@viollier_ferrozine_2000]. Citrate-ascorbate extractions were used to quantify poorly crystalline Fe oxides that are reducible by soil microbes [@hyacinthe_reactive_2006]. Roughly 1.5 g of sample (dry mass equivalent) were immediately placed into preweighed bottles of the citrate-ascorbate solution, and in the lab, samples were reweighed, vortexed, shaken for 16 hours, and then centrifuged for 20 minutes at 1000 rcf. Poorly crystalline Fe concentrations were quantified using an inductively coupled plasma optical emission spectrometer (ICP-OES; Perkin Elmer Optima 5300 DV, Waltham, Massachusetts, USA). We then air-dried soil samples at room temperature for analysis of C and N concentrations. Dried subsamples were sieved to 2 mm and all major visible roots were removed by hand. These samples were then ground to a fine powder and analyzed in duplicate for total C and N using an elemental analyzer (CE Elantech, Lakewood, New Jersey, USA).
+
+## Wavelet-Information Theory Analysis
+We used a combination of wavelet time series decomposition and information theory to (1) isolate major time scales of variation within the continuous CH~4~ flux time series, and (2) identify scale-emergent interactions between CH~4~ fluxes and a number of biophysical drivers. This technique allowed us to isolate CH~4~ flux controls operating at hourly, diel, and multiday timescales, and has been previously used to identify scale-emergent controls of CH~4~ flux at the peat and mature wetlands  [@sturtevant_identifying_2016]. Relative mutual information (*I^R^*), an information theory metric, was used to identify relationships between variables. Mutual information is derived from Shannon entropy (*H*), a measure of uncertainty [@shannon1998mathematical], and *I^R^* quantifies the amount of information shared between two variables. Mutual information and other information theory metrics, such as transfer entropy, are particularly useful for identifying relationships in complex systems because they do not assume linearity or other functional relationships and are capable of identifying asynchronous relationships [@ruddell_applying_2013]. All wavelet decomposition and entropy calculations were conducted using the ProcessNetwork Software (http://www.mathworks.com/matlabcentral/fileexchange/41515-processnetwork-processnetwork-software), and a more detailed description of the approach can be found in the Supplemental Materials and @sturtevant_identifying_2016.
+
+## Statistical Analyses and Data Processing
+All additional data processing, statistical analysis, and visualization was conducted in R 3.4.1 [@r_citation] using the 'tidyverse' [@tidyverse], 'zoo' [@zoo], 'gridExtra' [@gridExtra], 'ggpubr' [@ggpubr], 'lubridate' [@lubridate], and 'scales' [@scales] packages. We used parametric statistics, such as ANOVA, Welch's t-tests, and Tukey's HSD, to assess differences in soil properties across/within sites because properties were normally distributed within soil horizons at each site. Annual GHG budgets were calculated using the 45x 100-year sustained-flux global warming potential for CH~4~ presented in @neubauer_moving_2015.
+
+We also analyzed the residuals of a generalized linear model (GAM) fit to daily CH~4~ fluxes at the mature wetland (2014-2017) using nine common biophysical drivers (described in Results) to assess whether changes in alluvium CH~4~ fluxes with time could be explained by common, non-edaphic drivers of stable state wetland CH~4~ flux. The GAM was fit using the 'caret' [@caret] and 'mgcv' [@mgcv] R packages, where smoothing parameters were chosen by generalized cross-validation and inclusion of feature selection was chosen by using the model formulation with the lowest root mean squared error following ten-fold cross-validation. The trained GAM was then used to predict CH~4~ fluxes at the peat and alluvium wetlands.Prior to model training and prediction, missing values in the biophysical driver data were imputed using k-nearest neighbors, where all values were centered and scaled. This manuscript is reproducible via R Markdown, and its code can be found at https://github.com/samdchamberlain/wetlandcomparison. The wavelet-information theory analysis was conducted using MATLAB and is not directly reproducible in R; however, MATLAB source code (https://github.com/samdchamberlain/ProcessNetwork_Software) is available online with this manuscript.
+
+# Results
+```{r load_process}
+#load and process wetland sites into half-hourly, daily, and annual sums
+source("R/peat19_processing.R") #19yr old 'mature' peat site
+source("R/peat6_processing.R") #6yr old peat site
+source("R/alluvium_processing.R") #alluvium site
+```
+
+## Soil Properties
+```{r soils, echo=FALSE, include=FALSE}
+source("R/soils.R") #process soils data into summary dataframe
+
+#Computation of signficant differences among sites. These output are reported by hand in the following section, where significance is reported at 0.05, 0.001, and 0.0001 levels for all values where P < 0.05. In all cases, the maximum P value is reported when multiple Tukey HSD comparisons are cited.  Data were normally distrubuted within each site/horizon combination, so ANOVA and Tukey's were used.
+
+#Accreted comparisons
+accreted <- subset(soils, horizon == "Accreted")
+
+hclfe_A <- aov(accreted$FeT_mg.g ~ accreted$site) #hcl fe
+summary(hclfe_A); TukeyHSD(hclfe_A)
+
+feII_A <- aov(accreted$FeII_mg.g ~ accreted$site) #feII
+summary(feII_A); TukeyHSD(feII_A)
+
+pcfe_A <- aov(accreted$FePC_mg.g ~ accreted$site) #fe PC
+summary(pcfe_A); TukeyHSD(pcfe_A)
+
+oxfe_A <- aov(accreted$percent_ox ~ accreted$site) #percent oxidized
+summary(oxfe_A); TukeyHSD(oxfe_A)
+
+pH_A <- aov(accreted$pH ~ accreted$site) #pH
+summary(pH_A); TukeyHSD(pH_A)
+
+percentC_A <- aov(accreted$C ~ accreted$site) #percent C
+summary(percentC_A); TukeyHSD(percentC_A)
+
+## Parent comparisons
+parent <- subset(soils, horizon == "Parent")
+
+hclfe_P <- aov(parent$FeT_mg.g ~ parent$site) #hcl fe
+summary(hclfe_P); TukeyHSD(hclfe_P)
+
+feII_P <- aov(parent$FeII_mg.g ~ parent$site) #feII
+summary(feII_P); TukeyHSD(feII_P)
+
+pcfe_P <- aov(parent$FePC_mg.g ~ parent$site) #fe PC
+summary(pcfe_P); TukeyHSD(pcfe_P)
+
+oxfe_P <- aov(parent$percent_ox ~ parent$site) #percent oxidized
+summary(oxfe_P); TukeyHSD(oxfe_P)
+
+pH_P <- aov(parent$pH ~ parent$site) #pH
+summary(pH_P); TukeyHSD(pH_P)
+
+percentC_P <- aov(parent$C ~ parent$site) #percent C
+summary(percentC_P); TukeyHSD(percentC_P)
+
+percentN_P <- aov(parent$N ~ parent$site) #percent C
+summary(percentN_P); TukeyHSD(percentN_P)
+```
+
+Extractable Fe concentrations were significantly higher in recently accreted and parent alluvium soil horizons compared to those at the peat wetland (Tukey's HSD, *P* < 0.001) (Fig. 2a). Extractable Fe concentrations trended lower in the accreted compared to parent horizon at both wetlands, but these differences were not significant (Fig. 2a). Appreciable quantities of Fe^3+^ were present in all site horizons, where `r mean(soils$percent_ox[which(soils$site == "Alluvium")])`% and `r mean(soils$percent_ox[which(soils$site == "Peat")])`% of extractable Fe was in Fe^3+^ form at the alluvium and peat sites, respectively. Most Fe was in the reduced Fe^2+^ form across both sites, and statistical trends in Fe^2+^ concentrations were similar to total extractable Fe (Fig. 2b). While total extractable Fe concentrations did not vary between horizons at the alluvium site, Fe^2+^ concentrations were significantly higher in the accreted horizon compared to its underlying parent soil (Welch's t, *P* < 0.001).
+
+Poorly crystalline Fe oxide concentrations were roughly two orders of magnitude lower than HCl-extractable Fe concentrations across both sites (Fig. 2c), and trends were similar to HCl-extractable Fe. Poorly crystalline Fe concentrations were significantly higher at the alluvium site in both soil horizons (Tukey's HSD, *P* < 0.0001), and did not vary between horizons at either wetland (Fig. 2c). Mean poorly crystalline Fe concentrations were roughly an order of magnitude higher in alluvium soils (`r mean(soils$FePC_mg.g[which(soils$site == "Alluvium")])` $\pm$ `r sd(soils$FePC_mg.g[which(soils$site == "Alluvium")])` mg Fe g^-1^ soil; *n* = `r sum(!is.na(soils$FePC_mg.g[which(soils$site == "Alluvium")]))`) compared to peat soils (`r mean(soils$FePC_mg.g[which(soils$site == "Peat")])` $\pm$ `r sd(soils$FePC_mg.g[which(soils$site == "Peat")])` mg Fe g^-1^ soil; *n* = `r sum(!is.na(soils$FePC_mg.g[which(soils$site == "Peat")]))`).
+
+Soil pH also varied across the wetlands (ANOVA, *P* < 0.05), where alluvium soils were acidic (`r mean(soils$pH[which(soils$site == "Alluvium")])` $\pm$ `r sd(soils$pH[which(soils$site == "Alluvium")])`; *n* = `r sum(!is.na(soils$pH[which(soils$site == "Alluvium")]))`) and peat soils were near-neutral (`r mean(soils$pH[which(soils$site == "Peat")], na.rm=T)` $\pm$ `r sd(soils$pH[which(soils$site == "Peat")], na.rm=T)`; *n* = `r sum(!is.na(soils$pH[which(soils$site == "Peat")]))`) (Fig. 2d). pH did not vary by depth at the peat wetland; however, the parent horizon was significantly more acidic at the alluvium wetland (Welch's t, *P* < 0.0001) (Fig. 2d).
+
+Parent horizon C concentrations did not vary between the peat and alluvium wetlands (Tukey's HSD, *P* = 0.50) (Fig. 2e). Significant differences in C concentrations were observed in the accreted horizon (Tukey's HSD, *P* < 0.0001), where C concentrations were higher at the peat site (`r mean(soils$C[which(soils$site == "Peat")], na.rm=T)` $\pm$ `r sd(soils$C[which(soils$site == "Peat")], na.rm=T)`%; *n* = `r sum(!is.na(soils$C[which(soils$site == "Peat" & soils$horizon == "Accreted")]))`) than the alluvium site (`r mean(soils$C[which(soils$site == "Alluvium")])` $\pm$ `r sd(soils$C[which(soils$site == "Alluvium")])`%; *n* = `r sum(!is.na(soils$C[which(soils$site == "Alluvium" & soils$horizon == "Accreted")]))`). Soil C concentrations were higher in the recently accreted horizon at the peat site (Welch's t, *P* < 0.001), but no differences in C concentration were observed between horizons at the alluvium wetland (Fig. 2e). Similar patterns were observed for soil N concentrations across sites; however, parent horizon N concentrations were significantly lower at the alluvium compared to peat site (Tukey's HSD, *P* = 0.01) (Fig. 2f).
+
+```{r fig2, fig.cap="Soil (a) HCl-extractable Fe, (b) ferrous iron (Fe^2+^), (c) poorly crystalline Fe oxides (Fe~ca~), (d) pH, (e) C concentration (%), and (f) N concentration (%) in accreted and parent horizons across the peat and alluvium wetlands (*n* $\\geq$ 12 per depth). Solid horizontal lines are medians, boxes are the interquartile range, whiskers are the 95% confidence interval, and points denote measured outliers. Significance levels are shown for pairwise comparisons between soil horizons at each site (Welch's t-test), where ns denotes no significant differences and increasing asterisks denotes significance levels from *P* < 0.05, 0.01, 0.001, to 0.0001.", fig.width=8, fig.height=4, dpi=600}
+source("R/soils.R") #process soils data into summary dataframe
+#theme
+boxplot_theme <- theme(axis.text.x = element_text(size=8),
+                 axis.title.y = element_text(size=9),
+                 axis.title.x = element_blank())
+
+new_wetlands <- subset(soils, site != "Mature")
+
+a <- ggplot(new_wetlands, aes(x=site, y=FeT_mg.g, fill=horizon)) +
+  geom_boxplot() +
+  ylab(expression("Extractable Fe (mg "~g^{-1}~"soil)")) +
+  stat_compare_means(aes(group = horizon), label = "p.signif", method="t.test") +
+  scale_y_continuous(limits=c(0,32)) +
+  annotate("text",x=0.6,y=32,label="(a)", fontface = "bold") +
+  boxplot_theme + theme(legend.position="none")
+
+b <- ggplot(new_wetlands, aes(x=site, y=FeII_mg.g, fill=horizon)) +
+  geom_boxplot() +
+  ylab(expression("Fe2+ (mg "~g^{-1}~"soil)")) +
+  stat_compare_means(aes(group = horizon), label = "p.signif", method="t.test") +
+  scale_y_continuous(limits=c(0,25)) +
+  annotate("text", x=0.6, y=25, label="(b)", fontface = "bold") +
+  boxplot_theme + theme(legend.position="none")
+
+c <- ggplot(new_wetlands, aes(x=site, y=FePC_mg.g, fill=horizon)) +
+  geom_boxplot() +
+  ylab(expression(Fe[ca]~" (mg "~g^{-1}~"soil)")) +
+  stat_compare_means(aes(group = horizon), label = "p.signif", method="t.test") +
+  scale_y_continuous(limits=c(0,0.5)) +
+  annotate("text", x=0.6, y=0.5, label="(c)", fontface = "bold") +
+  boxplot_theme + theme(legend.position="none")
+
+d <- ggplot(new_wetlands, aes(x=site, y=pH, fill=horizon)) +
+  geom_boxplot() +
+  stat_compare_means(aes(group = horizon), label = "p.signif", method="t.test") +
+  scale_y_continuous(limits=c(4.5,7.6)) +
+  ylab(expression("pH")) +
+  annotate("text", x=0.6, y=7.6, label="(d)", fontface = "bold") +
+  boxplot_theme +
+  theme(legend.position=c(.79,.2), legend.title = element_blank(), 
+        legend.margin = margin(0, 0, 0, 0), 
+        legend.background = element_rect(fill = "white"))
+
+e <- ggplot(new_wetlands, aes(x=site, y=C, fill=horizon)) +
+  geom_boxplot() +
+  stat_compare_means(aes(group = horizon), label = "p.signif", method="t.test") +
+  ylab(expression("%C")) +
+  scale_y_continuous(limits=c(10,30)) +
+  annotate("text", x=0.6, y=30, label="(e)", fontface = "bold") +
+  boxplot_theme + theme(legend.position="none")
+
+f <- ggplot(new_wetlands, aes(x=site, y=N, fill=horizon)) +
+  geom_boxplot() +
+  stat_compare_means(aes(group = horizon), label = "p.signif", method="t.test") +
+  ylab(expression("%N")) +
+  #scale_y_continuous(limits=c(10,30)) +
+  annotate("text", x=0.6, y=1.6, label="(f)", fontface = "bold") +
+  boxplot_theme + theme(legend.position="none")
+
+grid.arrange(a, b, c, d, e, f, ncol=3)
+```
+
+## Post-restoration Flux Trajectories 
+Methane flux trajectories from the peat and alluvium wetlands were quite different following initial restoration, where flux magnitudes were considerably lower from the alluvium site for the first three years following restoration and later converged with the peat site (Fig. 3a). Across both sites, in the first year wetlands were open water and non-vegetated, leading to low CH~4~ flux and *NEE* compared to following years (Fig. 3), and by the second year both sites were fully vegetated. Alluvium wetland fluxes increased with each year, whereas CH~4~ fluxes from the peat wetland peaked during the second year and decreased with subsequent years (Figs. 3a). Differences in daily fluxes across wetlands were largest during the second year when alluvium wetland fluxes were increasing and peat wetland emissions were peaking (Fig. 3a). Annual CH~4~ budgets for the peat site were over two times larger than the alluvium site during the first and second year. First year budgets were `r alluvium_yearly$tCH4[alluvium_yearly$year == 2014]` $\pm$ `r alluvium_yearly$ciCH4[alluvium_yearly$year == 2014]` and `r peat6_yearly$tCH4[peat6_yearly$year == 2011]` $\pm$ `r peat6_yearly$ciCH4[peat6_yearly$year == 2011]` g CH~4~-C m^-2^ yr^-1^ (mean $\pm$ 95% CI) for the alluvium and peat wetland, respectively, and second year budgets were `r alluvium_yearly$tCH4[alluvium_yearly$year == 2015]` $\pm$ `r alluvium_yearly$ciCH4[alluvium_yearly$year == 2015]` and `r peat6_yearly$tCH4[peat6_yearly$year == 2012]` $\pm$ `r peat6_yearly$ciCH4[peat6_yearly$year == 2012]` g CH~4~-C m^-2^ yr^-1^ for the alluvium and peat wetland, respectively. This gap began to close during year three, and fluxes were similar across sites by year four (Fig. 3a), when annual fluxes were `r alluvium_yearly$tCH4[alluvium_yearly$year == 2017]` $\pm$ `r alluvium_yearly$ciCH4[alluvium_yearly$year == 2017]` and `r peat6_yearly$tCH4[peat6_yearly$year == 2014]` $\pm$ `r peat6_yearly$ciCH4[peat6_yearly$year == 2014]` g CH~4~-C m^-2^ yr^-1^ from the alluvium and peat wetland, respectively.
+
+Differences in *NEE* were less notable across the two recently restored wetlands and did not follow similar trends to CH~4~ flux. Daily *NEE* was similar across the two wetlands during the first and second year (Fig. 3b), and annual budgets did not differ across the two sites during these years. First year budgets were `r alluvium_yearly$tNEE[alluvium_yearly$year == 2014]` $\pm$ `r alluvium_yearly$ciNEE[alluvium_yearly$year == 2014]` and `r peat6_yearly$tNEE[peat6_yearly$year == 2011]` $\pm$ `r peat6_yearly$ciNEE[peat6_yearly$year == 2011]` g C m^-2^ yr^-1^, and second year budgets were `r alluvium_yearly$tNEE[alluvium_yearly$year == 2015]` $\pm$ `r alluvium_yearly$ciNEE[alluvium_yearly$year == 2015]` and `r peat6_yearly$tNEE[peat6_yearly$year == 2012]` $\pm$ `r peat6_yearly$ciNEE[peat6_yearly$year == 2012]` g CO~2~-C m^-2^ yr^-1^ for the alluvium and peat wetland, respectively. During year three, the peat wetland sequestered less CO~2~ despite emitting more CH~4~ compared to the alluvium wetland (Fig. 3b). Here, annual *NEE* was significantly less from the peat wetland (`r peat6_yearly$tNEE[peat6_yearly$year == 2013]` $\pm$ `r peat6_yearly$ciNEE[peat6_yearly$year == 2013]` g CO~2~-C m^-2^ yr^-1^) compared to the alluvium wetland (`r alluvium_yearly$tNEE[alluvium_yearly$year == 2016]` $\pm$ `r alluvium_yearly$ciNEE[alluvium_yearly$year == 2016]` g CO~2~-C m^-2^ yr^-1^). Similar to CH~4~ fluxes during year four, daily *NEE* were roughly equivalent between the two recently restored sites, though the onset of CO~2~ uptake varied (Fig. 3b).
+
+Other dominant biophysical drivers of GHG fluxes, including evapotranspiration (*ET*), photosynthetically active radiation (*PAR*), air temperature (*T~a~*), and water table depth (*WTD*), were similar across the wetlands, despite measurements occurring across different time periods (2011 - 2014 for the peat site; 2014 - 2017 for the alluvium site). Daily *ET* exhibited a similar seasonality and magnitude across sites, with the exception of the second year at the peat wetland when particularly large *ET* rates were observed (Fig. 3c). Daily mean *PAR* and *T~a~* were also similar across the wetlands during these time periods, and values generally overlapped in range (Fig. 3d,e). Additionally, the water table was always above surface at either wetland for the first three years following restoration and is therefore not responsible for reduced CH~4~ fluxes at the alluvium wetland (Fig. 3f).
+
+```{r fig3, fig.cap="Daily (a) methane flux (*F~CH4~*), (b) net ecosystem exchange (*NEE*), (c) evapotranspiration (*ET*), as well as mean (d) photosynthetically active radiation (*PAR*), (e) air temperature (*T~a~*), and (f) water table depth (*WTD*) at the peat and alluvium wetland from time since initial restoration. Day one is 2011-01-01 for the peat wetland and 2014-01-01 for the alluvium wetland.", fig.width=6, fig.height=8, dpi=600}
+time_series <- theme_bw() +
+  theme(panel.grid.minor=element_blank(), panel.grid.major.y = element_blank(),
+        axis.title.x = element_blank(), axis.title.y = element_text(size=9))
+
+#merge daily sums to single dataset
+new_wetlands <- rbind(alluvium_daily, peat6_daily)
+new_wetlands$date <- as.Date(new_wetlands$datetime) #data plotting variable
+
+#create a year since restoration column
+new_wetlands$rest_year <- ifelse(new_wetlands$site == "Alluvium",  
+                         new_wetlands$year - 2014, new_wetlands$year - 2011)
+
+#compare first three years only (we only have 3.5 yrs of alluvium site)
+trajectory <- subset(new_wetlands, rest_year < 4)
+
+#Early restoration time series
+a <- ggplot(trajectory, aes(x=dday/365, y=mgCH4, color=site)) +
+  geom_point(aes(fill=site), colour="black", pch=21, size=0.9) +
+  ylab(expression(F[CH4]~" "~"("~mg~C~m^{-2}~d^{-1}~")")) + 
+  annotate("text", x=5, y=Inf, label="(a)", vjust=1, hjust=1, fontface = "bold") +
+  theme_bw() + time_series +
+  theme(legend.title=element_blank(), legend.margin = margin(0, 0, 0, 0),
+        legend.position=c(.12, .80),
+        legend.key.size =  unit(0.17, "in"), legend.text = element_text(size=8),
+        legend.background = element_rect(fill = "transparent"))
+
+b <- ggplot(trajectory, aes(x=dday/365, y=gCO2, color=site)) +
+  geom_point(aes(fill=site), colour="black", pch=21, size=0.9) +
+  ylab(expression("NEE "~"("~g~C~m^{-2}~d^{-1}~")")) +
+  annotate("text", x=5, y=Inf, label="(b)", vjust=1, hjust=1, fontface = "bold") +
+  theme_bw() + time_series + theme(legend.position = "none")
+
+c <- ggplot(trajectory, aes(x=dday/365, y=mET, color=site)) +
+  geom_point(aes(fill=site), colour="black", pch=21, size=0.9) +
+  ylab(expression("ET ("~mm~d^{-1}~")")) +
+  annotate("text", x=5, y=Inf, label="(c)", vjust=1, hjust=1, fontface = "bold") +
+  theme_bw() + time_series + theme(legend.position = "none")
+
+d <- ggplot(trajectory, aes(x=dday/365, y=PAR, color=site)) +
+  geom_line(size=0.5) + theme_bw() +
+  ylab(expression(PAR~" ("~mu~mol~m^{-2}~s^{-1}~")")) + 
+  annotate("text", x=5, y=Inf, label="(d)", vjust=1, hjust=1, fontface = "bold") +
+  theme_bw() + time_series + theme(legend.position = "none")
+
+e <- ggplot(trajectory, aes(x=dday/365, y=Tair, color=site)) +
+  geom_line(size=0.5) + theme_bw() +
+  ylab(expression(T[a]~" ("~degree~C~")")) +
+  annotate("text", x=5, y=Inf, label="(e)", vjust=1, hjust=1, fontface = "bold") +
+  theme_bw() + time_series + theme(legend.position = "none")
+
+f <- ggplot(trajectory, aes(x=dday/365, y=WTD, color=site)) +
+  geom_line(size=0.5) + theme_bw() +
+  ylab("WTD (cm)") + xlab("Wetland age (years)") +
+  geom_hline(yintercept=0, linetype="dashed") +
+  annotate("text", x=5, y=Inf, label="(f)", vjust=1, hjust=1, fontface = "bold") +
+  theme_bw() + 
+  theme(legend.position = "none", panel.grid.minor=element_blank(), 
+        panel.grid.major.y = element_blank(), axis.title.y = element_text(size=9))
+
+#Multiple plots aligned
+iA <- ggplotGrob(a)
+iB <- ggplotGrob(b)
+iC <- ggplotGrob(c)
+iD <- ggplotGrob(d)
+iE <- ggplotGrob(e)
+iF <- ggplotGrob(f)
+
+maxWidth = grid::unit.pmax(iA$widths[2:5], iB$widths[2:5], iC$widths[2:5], iD$widths[2:5], iE$widths[2:5], iF$widths[2:5])
+iA$widths[2:5] <- as.list(maxWidth); iB$widths[2:5] <- as.list(maxWidth); iC$widths[2:5] <- as.list(maxWidth); 
+iD$widths[2:5] <- as.list(maxWidth); iE$widths[2:5] <- as.list(maxWidth); iF$widths[2:5] <- as.list(maxWidth); 
+
+grid.arrange(iA, iB, iC, iD, iE, iF, ncol=1)
+
+```
+
+## Biophysical drivers of CH~4~ flux
+During the second year post-restoration when differences in CH~4~ flux magnitudes between the peat and alluvium wetland were largest (Fig. 3a) and both wetlands were fully vegetated, CH~4~ flux patterns and their relations to biophysical drivers were notably different across sites (Fig. 4). Methane fluxes from the peat wetland during year two (2012) were strongly coupled to plant processes across multiple time scales (Fig. 4a,c,e). At the hourly time scale, CH~4~ flux shared most information with *ET* (Fig. 4a), and at the diel scale, dominant interactions were synchronous and related to plant processes, such as *ET*, *NEE*, and gross ecosystem photosynthesis (*GEP*) as well as wind direction (*WD*) (Fig. 4c). At the multiday time scale, CH~4~ flux only shared significant levels of information with *ET* and *WD* (Fig. 4e). In total, 51.5% of total CH~4~ flux variability occurred at the diel scale, 33.4% occurred the multiday scale, and 15.1% occurred at the hourly time scale (Fig. 4a,c,e). Peat wetland CH~4~ fluxes peaked between 10:00 to 12:00 local time (LT) coinciding with the period of peak *NEE* (Fig. S1).
+
+![Mutual information (*I^R^*) shared between methane flux (*F~CH4~*) and biophysical variables at multiple time scales for the peat and alluvium wetland (a-f) the second year post-restoration (year two) when both wetlands were fully vegetated and (g-l) during the 2016 growing season. Black bars indicate *I^R^* at zero time lag, and colored extension indicates maximum *I^R^* observed at the time lag illustrated by the color scale. Vertical grey bars represent 95% confidence intervals generated from 1000 Monte Carlo random walks. Italicized percentage inset on each panel indicates the percent of total wavelet variance occurring at each time scale. Biophysical variables include net ecosystem exchange (*NEE*), gross ecosystem photosynthesis (*GEP*), evapotranspiration (*ET*), air temperature (*T~a~*), air pressure (*PA*), friction velocity (*u$^\ast$*), wind direction (*WD*), soil temperature (*T~s~*), and water temperature (*T~w~*).](fig4.png)
+
+Alluvium wetland CH~4~ flux patterns and interactions the second year post-restoration (2015) were notably different from the peat wetland. Alluvium wetland CH~4~ fluxes were dominantly coupled to physical processes at diel to multiday time scales, such as temperature and atmospheric pressure (*PA*) fluctuations (Fig. 4b,d,f), in contrast to the peat site where fluxes were primarily coupled to plant processes (Fig. 4a,c,e). At the hourly scale, CH~4~ fluxes also shared most information with *ET* (Fig. 4b). At the diel scale, dominant interactions were observed with *PA* and water temperature (*T~w~*) at no time lag, and with *T~a~* at a three hour lag (Fig. 4d). Here, wetland maximum CH~4~ fluxes were observed in the late afternoon during atmospheric pressure lows (17:00 to 19:00 LT), and this relationship displayed strong hysteresis (Fig. S2). This dominant diel *PA* interaction was not observed at the peat site (Fig. 4c). Strong interactions were also observed between CH~4~ flux and *GEP*/*NEE*/*ET*, but these interactions occurred at a four to five hour time lag (Fig. 4d). These interactions can be intuitively seen through the timing of fluxes, where peak *NEE* and *ET* were observed mid-day, while peak CH~4~ flux occurred many hours later in the afternoon (Fig. S3). At the multiday scale, alluvium CH~4~ fluxes only shared significant information with temperature variables (*T~a~* and *T~w~*) (Fig. 4f). Hourly scale CH~4~ flux variability was more dominant at the alluvium wetland in year two, as 57% of total CH~4~ flux signal variability occurred at the diel scale, 30.5% occurred at the hourly scale, and only 12.5% occurred at the multiday time scale (Fig. 4b,d,f).
+
+By the 2016 growing season, CH~4~ flux patterns and interactions had converged across the peat and alluvium wetland sites. Peak CH~4~ fluxes were observed at roughly 15:00 LT at both sites by 2016. This shift to an afternoon peak flux occurred in 2013 at the peat wetland, and patterns in flux timing were similar for each year thereafter (Fig. S1). Both alluvium and peat sites were quite different in terms of flux timing compared to the mature site, where peak CH~4~ flux occurred around noon most years (Fig. S1). 
+
+Scale-emergent controls of CH~4~ flux were also very similar between the alluvium and peat site during the 2016 growing season (Fig. 4). For both sites, hourly CH~4~ fluxes exhibited dominant synchronous couplings to friction velocity (*u$^\ast$*) and *ET* (Fig. 4g,h), and at the diel scale, dominant interactions with CH~4~ flux included *T~a~*, *ET*, *GEP*, and *NEE* at both wetlands (Fig. 4i,j). By 2016, dominant synchronous *PA* interactions observed at the alluvium site (Fig. 4d) were no longer apparent, though *PA* shared similar levels of information with CH~4~ flux at a 5-6 hour time lag (Fig. 4j). Multiday scale interactions were also similar across sites, where significant interactions with temperature variables (*T~a~*, *T~w~*, and *T~s~*), as well as *ET*, were observed (Fig. 4k,l). There were some notable differences between sites at the multiday scale, as CH~4~ flux also shared information with *NEE* at the peat site (Fig. 4k), and CH~4~ flux shared information with *PA* at the alluvium site (Fig. 4l). At the peat wetland, most variability still occurred at the diel scale (48.1%), followed by the multiday (29.2%) and hourly (22.7%) time scales (Fig. 4g,i,k). Most variability at the alluvium wetland still occurred at the diel scale (44.6%), followed closely by the hourly scale (41.4%), and much less variability occurred at the multiday scale (14%) (Fig. 4h,j,l).
+
+## What explains increasing alluvium CH~4~ fluxes with time?
+```{r model_fit_prediction, echo=FALSE, warning=FALSE, include=FALSE}
+
+#use mature dataset for model fitting
+peat19_train <- peat19_daily %>%
+  ungroup() %>%
+  select(mgCH4, PAR, Tair, mVPD, PA, u., mET, gER, gGEP, mGCC) #use eight common driving variables
+
+#cross validated model training where optimal model parameters are chosen, missing values are knn imputed
+#generalized additive model
+set.seed(1000)
+gam_fit <- train(mgCH4 ~ PAR + Tair + mVPD + PA + u. + mET + gER + gGEP + mGCC, data = peat19_daily, method = "gam",
+                  preProcess = c("knnImpute"),
+                  trControl = trainControl(method = "cv"),
+                  na.action = na.pass)
+
+# extract prediction datasets, only using time periods when wetlands were filly vegetated
+alluvium <- alluvium_daily %>%
+  select(mgCH4, PAR, Tair, mVPD, PA, u., mET, gER, gGEP, mGCC, year) %>%
+  filter(year < 2018 & year > 2014)
+
+peat <- peat6_daily %>%
+  select(mgCH4, PAR, Tair, mVPD, PA, u., mET, gER, gGEP, mGCC, year) %>%
+  filter(year < 2018 & year > 2011)
+
+# generate predictions for peat and alluvium wetlands
+alluvium$pred <- predict.train(gam_fit, alluvium, na.action = na.pass)
+peat$pred <- predict.train(gam_fit, peat, na.action = na.pass)
+
+# ...and residuals
+alluvium$resid <- alluvium$mgCH4 - alluvium$pred
+peat$resid <- peat$mgCH4 - peat$pred
+
+#regression fits (obs v. pred)
+regr_peat <- lm(pred ~ mgCH4, data=peat); summary(regr_peat)
+regr_alluvium <- lm(pred ~ mgCH4, data=alluvium); summary(regr_alluvium)
+
+# 2017 only model comparison
+regr_alluvium2017 <- lm(pred ~ mgCH4, data=subset(alluvium, year == 2017)); summary(regr_alluvium2017)
+```
+
+To determine whether long-term increases in alluvium wetland CH~4~ emissions could be explained by common biophysical drivers, we trained an empirical CH~4~ flux model using observations from a third independent, mature wetland site that was restored in 1999 and is located ~700m from the alluvium wetland. The model predicted CH~4~ fluxes based on nine common biophysical drivers identified here and in @sturtevant_identifying_2016, including *PAR*, *T~a~*, *PA*, *u$^\ast$*, *GEP*, *ER*, a greenness index (*GCC*), and vapor pressure deficit. We fit a GAM using penalized regression splines to capture non-linear relationships, and the model was fit to four years of daily flux data from the mature wetland (*n* = `r nrow(peat19_train)`), where ten-fold cross-validation was used to tune the model for best fit (final model - no feature selection; *r^2^* = `r  max(gam_fit$results$Rsquared)`).
+
+The trained GAM performed relatively well against observed peat wetland CH~4~ fluxes (*r^2^* = `r  summary(regr_peat)$r.squared`). Within each year (2012 - 2017), residual CH~4~ fluxes were distributed around zero and skewed slightly negative, indicating some overestimation in predicted fluxes. The model residual interquartile range (IQR) always overlapped with zero, except for 2017 when multiple disturbance events reduced CO2 and CH4 fluxes from the peat wetland (Fig. 5).
+
+The GAM performance against the alluvium wetland was notably worse (*r^2^* = `r  summary(regr_alluvium)$r.squared`) and was highly variable across years (Fig. 5). Observed alluvium CH~4~ fluxes were substantially lower than model predictions the second year following restoration (2015), as indicated by negative residuals when the IQR did not cross zero (Fig. 5). This strong negative skew reduced in subsequent years, and by 2017 there was no observed bias in model CH~4~ residuals (Fig. 5). The GAM predicted `r summary(regr_alluvium2017)$r.squared*100`% of observed variance in 2017, indicating more accurate CH~4~ flux predictions as the alluvium wetland developed. 
+
+Model over-prediction in early years at the alluvium wetland suggests that other factors, not measured directly by the eddy covariance tower, could have inhibited initial CH~4~ emissions. Though our soil data was collected during a single sampling in 2017, we can substitute depth for time to track changes in soil properties over this time period. If we assume the parent horizon is indicative of soils at the time of restoration and the accreted horizon is indicative of the current state of wetland soils, we observe a significant increase in soil pH (Fig. 2d) and a shift towards more Fe in its reduced form (Fe^2+^) as alluvium wetland soils developed (Fig. 2b).
+
+```{r fig5, fig.cap="Residual CH~4~ flux (*F~CH4~*; mg C m^-2^ d^-1^) for both recently restored wetlands using an empirical model trained on CH~4~ fluxes from a mature, stable state wetland site restored in 1999. A generalized additive model was trained on four years of daily CH~4~ fluxes using nine common biophysical drivers (see Results for details) and ten-fold cross validation. First year fluxes were omitted from residual analysis because the model was trained on a fully vegetated, mature wetland.", fig.width=7.5, fig.height=3, dpi=600}
+
+a <- ggplot(peat, aes(x=factor(year), y=resid)) +
+  geom_ref_line(h = 0) +
+  geom_boxplot(outlier.shape = NA) +
+  xlab("Year") + ylab(expression("Residual "~F[CH4]~" (mg C"~m^{-2}~d^{-1}~")")) +
+  ggtitle("Peat wetland") +
+  scale_y_continuous(limits = c(-300, 200))
+
+b <- ggplot(alluvium, aes(x=factor(year), y=resid)) +
+  geom_ref_line(h = 0) +
+  geom_boxplot(outlier.shape = NA) +
+  xlab("Year") + ylab(expression("Residual "~F[CH4]~" (mg C"~m^{-2}~d^{-1}~")")) +
+  ggtitle("Alluvium wetland") +
+  scale_y_continuous(limits = c(-300, 200))
+
+grid.arrange(a, b, nrow=1)
+```
+
+## Implications for restored wetland GHG emissions
+Methane emissions from the alluvium wetland increased steadily with time. This stands in contrast to the trend of reducing CH~4~ emissions in recent years at the other wetlands, where annual CH~4~ budgets from the peat and mature wetland covaried and were not statistically different from one another from 2014 to 2017 (Fig. 6a). By 2017, annual CH~4~ fluxes from the alluvium wetland exceeded emissions from the peat and mature wetlands, though were significantly lower than emissions from the other sites in the previous two years (2015 and 2016) (Fig. 6a). In 2015, alluvium CH~4~ budgets were 48-50% the magnitude of the other sites, and in 2016 the alluvium CH~4~ budget was 75-78% of the other sites (Fig. 6a). Reduced CH~4~ budgets in 2015 and 2016 initially corresponded to neutral GHG emissions from the alluvium wetland (Fig. 6b); however, by 2017 the alluvium GHG budget was positive and trended larger than the other sites (Fig. 6b). Conversely, the peat and mature wetlands were both GHG sources from 2014 to 2016, and GHG neutral in 2017 (Fig. 6b). Soil iron content (extractable and poorly crystalline Fe) was similar across parent horizons of peat and mature wetlands (Tukey's HSD, *P* > 0.5) (Fig. S5), though soil C concentrations were significantly higher at the mature wetland compared to the peat and alluvium sites (Tukey's HSD, *P* < 0.01) (Fig. S5). These wetlands experienced similar climatic and hydrologic conditions over this time period (Fig. S3).
+
+```{r fig6, fig.cap="Annual CH~4~ flux (*F~CH4~*) and greenhouse gas budget (GHG) across the two recently restored peat and alluvium wetlands, as well as the mature wetland restored on peat soils. Annual GHG balance is computed from annual *F~CH4~* and *NEE* budgets using the sustained global warming potential for CH~4~ [@neubauer_moving_2015].", fig.width=5, fig.height=4, dpi=600}
+time_series <- theme_bw() +
+  theme(panel.grid.minor=element_blank(), panel.grid.major.x = element_blank(),
+        axis.title.y = element_text(size=9))
+pd <- position_dodge(width = 0.0) #dodge parameter
+
+#merge annual budgets to single dataset
+all_annual <- rbind(peat19_yearly, peat6_yearly); all_annual <- rbind(all_annual, alluvium_yearly)
+all_annual$site <- factor(all_annual$site, levels=c("Alluvium", "Peat", "Mature"))
+all_pst14 <- subset(all_annual, year > 2013)
+
+# only show years when wetlands are fully vegetated (developed fluxes)
+all_pst14$tCH4 <- ifelse(all_pst14$site == "Alluvium" & all_pst14$year == 2014, NA, all_pst14$tCH4)
+all_pst14$GHGbalance <- ifelse(all_pst14$site == "Alluvium" & all_pst14$year == 2014, NA, all_pst14$GHGbalance)
+
+
+a <- ggplot(all_pst14, aes(x=year, y=tCH4, color=site)) +
+        geom_point(position = pd) + geom_line() +
+        geom_errorbar(aes(ymin = tCH4 - ciCH4, ymax = tCH4 + ciCH4), position = pd, width = 0) +
+        scale_x_continuous(breaks = c(2014, 2015, 2016, 2017)) +
+        ylab(expression(F[CH4]~"("~g~C~m^{-2}~yr^{-1}~")")) + 
+        annotate("text", x=2017, y=60, label="(a)", fontface = "bold") +
+        time_series + theme(legend.title=element_blank(), legend.margin = margin(0, 0, 0, 0),
+                            legend.position=c(.12, .25), legend.key.size =  unit(0.17, "in"), 
+                            legend.text = element_text(size=8), legend.background = element_rect(fill = "transparent"),
+                            axis.title.x = element_blank())
+
+b <- ggplot(all_pst14, aes(x=year, y=GHGbalance, color=site)) +
+        geom_point(position = pd) + geom_line() +
+        geom_errorbar(aes(ymin = GHGbalance - ciGHG, ymax = GHGbalance + ciGHG), 
+                      position = pd, width = 0) +
+        scale_x_continuous(breaks = c(2014, 2015, 2016, 2017)) +
+        ylab(expression("GHG (g"~CO[2-eq]~m^{-2}~yr^{-1}~")")) + xlab("Year") +
+        annotate("text", x=2017, y=3000, label="(b)", fontface = "bold") +
+        time_series + theme(legend.position = "none")
+
+#Multiple plots aligned
+iA <- ggplotGrob(a)
+iB <- ggplotGrob(b)
+
+maxWidth = grid::unit.pmax(iA$widths[2:5], iB$widths[2:5])
+iA$widths[2:5] <- as.list(maxWidth); iB$widths[2:5] <- as.list(maxWidth)
+
+grid.arrange(iA, iB, ncol=1)
+```
+
+# Discussion
+Our results suggest that soil type, a legacy of the pre-drainage landscape, influences ecosystem-scale CH~4~ emissions from restored wetlands. We observed substantially lower CH~4~ emissions for multiple years following restoration from a wetland restored on alluvium compared to peat soils; however, CH~4~ flux magnitudes converged across the wetlands three years post-restoration (Fig. 3a). Initial CH~4~ flux differences were not driven by variable climate or hydrologic forcing, as these wetlands experienced similar meteorologic conditions and both remained inundated year-round (Fig. 3). Additionally, alluvium *NEE* was often similar to, or larger than, *NEE* from the peat site (Fig. 3b), demonstrating that differences in CH~4~ flux were not due to covariation with other factors broadly affecting wetland GHG exchange. Soil Fe, C content, and pH are edaphic factors known to influence CH~4~ production rates in soil [@teh_suppression_2008; @bridgham_methane_2013; @ye_ph_2012]. Soil C has been shown to be a strong proxy for CH~4~ emissions from rewetted peatlands on these islands [@ye_soil_2016]; however, soil C did not vary between wetlands at the time of restoration, as we observed similar C concentrations in parent horizons across both sites (Fig. 2). Additionally, soil C does not appear to drive CH~4~ emissions more broadly across the wetland network, as annual CH~4~ fluxes did not vary across peat and mature wetlands (Fig. 6), though their soil C concentrations varied substantially  (Fig. S5). These observations suggest that reduced CH~4~ emissions may instead be related to the acidic conditions and high Fe content in alluvium soils (Fig. 2). 
+
+Alluvium soil Fe concentrations were comparable to tropical forest soils where microbial Fe reduction is known to inhibit CH~4~ production. @yang_high_2015 observed mean Fe concentrations of 23.6 mg Fe g^-1^ soil in forest soils where @teh_suppression_2008 had previously documented suppression of methanogenesis by microbial Fe reduction. Alluvium wetland Fe concentrations were similar (`r mean(soils$FeT_mg.g[which(soils$site == "Alluvium")])` $\pm$ `r sd(soils$FeT_mg.g[which(soils$site == "Alluvium")])` mg Fe g^-1^ soil; *n* = `r sum(!is.na(soils$FeT_mg.g[which(soils$site == "Alluvium")]))`), demonstrating that Fe concentrations were within the range where microbial Fe reduction inhibits methanogenesis. In contrast to upland humid tropical forests where most Fe is found in poorly crystalline form [@dubinsky_tropical_2010; @hall_reducing_2015; @yang_high_2015], poorly crystalline Fe concentrations were roughly two orders of magnitude lower than the HCl-extractable Fe pool across the wetland sites. Poorly crystalline Fe pools are readily reducible by soil microbes [@hyacinthe_reactive_2006; @hall_reducing_2015], and depletion of these pools suggests high activity by microbial Fe reducers in wetland soils [@weiss_geochemical_2004]. Depleted reducible Fe pools in wetlands relative to upland systems is expected, as stable anoxic wetland conditions promotes extended Fe reducer activity and utilization of poorly crystalline Fe pools [@teh_suppression_2008; @dubinsky_tropical_2010]. Our observations of high Fe concentrations, low poorly crystalline Fe pools, and low CH~4~ fluxes at the alluvium wetland all suggest that Fe reduction is a dominant form of anaerobic respiration capable of inhibiting CH~4~ flux at this site. Differences in soil pH may also contribute to observed flux differences; however, strong inhibition of methanogenesis tends to occur at pH values below 5 [@dunfield_methane_1993; @kotsyurbenko_shift_2007; @ye_ph_2012], while we observed mean pH values of `r mean(soils$pH[which(soils$site == "Alluvium" & soils$horizon == "Parent")])` in the alluvium parent soils. Further incubation experiments are warranted to disentangle the direct mechanism reducing CH~4~ fluxes, as pH, Fe cycling, and redox state co-vary in inundated soils [@gotoh_transformation_1974].
+
+The question remains: Why did CH~4~ flux differences between the peat and alluvium wetlands disappear with time? Our empirical model based on dominant biophysical drivers of mature wetland CH~4~ flux, including *NEE*, *GEP*, and *ER*, could not explain why alluvium CH~4~ fluxes were initially low relative to the other sites (Fig. 6), suggesting that other factors might be responsible for reduced fluxes in early succession. We suspect this is related to soil development over time, as we observed increases in reduced ferrous iron (Fe^2+^) and a shift toward less acidic conditions in alluvium accreted soil compared to the underlying parent soil (Fig. 2). Increases in Fe^2+^ and pH suggest more reduced conditions favorable to methanogenesis in the accreted soils where poorly crystalline Fe pools are depleted faster than they are replenished. Acidic soils are also known to directly inhibit methanogenesis [@dunfield_methane_1993; @ye_ph_2012] and alter methanogen community structure [@kotsyurbenko_shift_2007], though often in more acidic conditions as described above. This interaction between less acidic and more reduced conditions could enhance CH~4~ production rates in the newly accreted soils as alluvium wetlands develop. 
+
+Initial differences in wetland biophysical CH~4~ drivers the second year following restoration provides a further line of evidence that alluvium CH~4~ fluxes were inhibited by Fe reduction. Alluvium CH~4~ fluxes were decoupled from plant processes across multiple scales compared to the peat site. Peat CH~4~ fluxes were more dominantly coupled to plant processes, such as *GEP* and *ET* (Fig. 4), while alluvium CH~4~ fluxes were more dominantly coupled to physical transport (pressure pumping; Fig. S2) and temperature, which dictates CH~4~ production rates in bulk soil [@yvon-durocher_methane_2014]. This decoupling from plant-derived substrates (*GEP*) and transport pathways (*ET*) suggests that less CH~4~ was derived from plant exudates in the rhizosphere. Oxygen is released into wetland soils through plant roots, and the rhizosphere is typically an area of high CH~4~ oxidation [@van_der_nat_seasonal_1998; @laanbroek_methane_2010]. The wetland rhizosphere is also a hotspot of microbial Fe oxidation and reduction given the co-occurrence of oxic-anoxic conditions [@weiss_enumeration_2003]. For sites with higher Fe, such as the alluvium wetland, CH~4~ fluxes might be more decoupled from plant substrates (*GEP*) and transport pathways (*ET*) where rhizosphere methanogenesis is further inhibited by active Fe redox cycling [@laanbroek_methane_2010]. Such inhibition of methanogenesis has been observed in microcosm and incubation studies, where oxygen input via plant roots re-oxidizes ferrous Fe and further suppresses CH~4~ production in the root zone [@roden_organic_1996; @frenzel_rice_1999; @sutton-grier_plant_2011]. Anaerobic microbial re-oxidation of Fe coupled to NO~3~^-^ reduction is also known to occur in wetland sediments [@weber_anaerobic_2006] and may be relevant to Fe cycling in these wetlands if significant NO~3~^-^ enters the system from upslope agriculture.
+
+Conversely, we might expect to see stronger couplings to plant processes for sites with lower soil Fe concentrations, as we observe for the peat wetland (Fig. 4). @sturtevant_identifying_2016 also demonstrated strong diel CH~4~ couplings to *ET* and *GEP* at the mature wetland where soil Fe concentrations are low relative to the alluvium site (Fig. S5). @hatala_gross_2012 and @knox_biophysical_2016 found that diel patterns in CH~4~ fluxes from Delta rice were driven by *GEP*, rather than temperature, because peak CH~4~ flux lagged *GEP* by ~1-2 hrs and led maximum soil temperature. We saw a very different dynamic at the alluvium wetland where peak CH~4~ flux occurred late in the afternoon, many hours after peak *GEP*, *ET*, and *T~a~*, and was instead synchronously coupled to *PA* and *T~w~* fluctuations (Fig. 4). These dynamics further suggest decoupling from recent plant-derived C substrates and transport pathways at the alluvium wetland, with more dominant couplings to physical transport and drivers of bulk soil methanogenesis, as expected if rhizosphere CH~4~ production was inhibited by active Fe redox.
+
+Convergence of CH~4~ flux biophysical drivers with time further suggests that as soils develop CH~4~ fluxes and controls become more similar across wetland types. The hierarchy of dominant biophysical drivers and lagged effects were quite similar across the peat and alluvium wetlands in 2016 (Fig. 4g-l) compared to the second year when flux-driver relationships were very different across the two systems (Fig. 4a-f). Here, the most notable shift occurred at the alluvium wetland, where CH~4~ fluxes were strongly coupled to physical processes in the second year (Fig. 4b,d,f) and by 2016 fluxes were also coupled to plant processes across multiple scales, such as *NEE*, *GEP*, and *ET* (Fig. 4h,j,l). The mature wetland GAM was also better able to predict alluvium wetland CH~4~ fluxes as this shift occurred (Fig. 5), further suggesting stronger couplings to plant processes as the alluvium wetland and its soils developed.
+
+Differences in controls across scale are discussed in more detail in @sturtevant_identifying_2016, but we find short-term (hourly) variability in CH~4~ flux is influenced by transport mechanisms (*ET* and *u$^\ast$*), diel variation is more dictated by plant processes and temperature (*NEE*, *GEP*, *ET*, and *T~a~*), while weekly to monthly variation is driven by temperature oscillations. Surprisingly, much more flux variability occurred at the multiday scale for the peat wetland than the alluvium wetland, and this pattern was consistent over time (Fig. 4). While the driver of this inter-site variation is not clear, it demonstrates that eddy covariance is particularly well-suited to ecosystem CH~4~ flux measurements. Non-automated chamber measurement campaigns could easily under-sample important modes of CH~4~ flux variation, particularly if dominant modes of variation change across wetlands distributed over small spatial scales.
+
+Overall, our findings demonstrate that soil type impacts ecosystem-scale CH~4~ emissions and GHG budgets from restored wetlands on annual time scales. We found that differences in CH~4~ flux between alluvium and peat wetlands were pronounced for the first few years following restoration, causing significant reductions in net GHG emissions from the wetland restored on alluvium soils (Fig. 6). Initial differences were most likely due to high Fe content within alluvium soils, as Fe concentrations were in the range where inhibition of methanogenesis is known to occur [@teh_suppression_2008], and soil C, another common driver of CH~4~ emissions [@ye_soil_2016], did not vary across sites at the initial point of restoration. However, reduced CH~4~ emissions and GHG budgets faded with time, likely due to the development of more reduced, less acidic conditions favorable to CH~4~ production within accreted alluvium sediments. Wetland restoration projects have a lifetime of multiple decades (over 20 years for the mature wetland), so these transient reductions in CH~4~ flux are likely of low importance from a policy or management perspective because any GHG benefit of restoring wetlands on alluvium soil are lost within a few years of restoration. This work illustrates a transient influence of soil properties on long-term wetland GHG emissions, which improves our understanding of site selection consequences to GHG emissions from restored wetlands.
+
+# Acknowledgements
+This research was supported in part by the U.S. Department of Energy’s Office of Science and its funding of Ameriflux core sites (Ameriflux contract 7079856), and the California Division of Fish and Wildlife, through a contract of the California Department of Water Resources (Award 4600011240). We thank three anonymous reviewers for their constructive feedback on drafts of this manuscript. 
+
+# References
+

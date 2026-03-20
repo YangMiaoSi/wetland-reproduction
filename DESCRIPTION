@@ -1,0 +1,19 @@
+Package: WetlandComparison
+Title: Reproduces Research for Sacramento-San Joaquin Delta Wetland Comparison
+Version: 0.0.0.9000
+Authors@R: person('Sam', 'Chamberlain', email='schamberlain@berkeley.edu', role = c('aut', 'cre'))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.3.2)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat,
+    knitr,
+    rmarkdown,
+    covr
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1.9000
+Imports: dplyr,
+    zoo,
+    lubridate,
+    magrittr
