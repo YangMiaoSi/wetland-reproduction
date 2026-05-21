@@ -46,26 +46,31 @@ Load package into RStudio and open the 'manuscript.Rmd' within the /vignettes fo
 - 去除缺失值
 - 剔除异常值
 - 统一变量格式
---克隆项目到本地
+
+克隆项目到本地
 bash
 运行
-git clone https://github.com/YangMiaoSi/wetland-reproduction.git
-cd wetland-reproduction
---打开 R/RStudio，还原项目环境
+- git clone https://github.com/YangMiaoSi/wetland-reproduction.git
+- cd wetland-reproduction
+
+打开 R/RStudio，还原项目环境
 r
 运行
 renv::restore()
+
 依次运行代码
--运行 R/data_preprocess.R 进行数据清洗
--运行 R/analysis.R 进行统计分析
--运行 R/visualization.R 生成图表
--生成 Quarto 报告（课程推荐）
--bash
+- 运行 R/data_preprocess.R 进行数据清洗
+- 运行 R/analysis.R 进行统计分析
+- 运行 R/visualization.R 生成图表
+- 生成 Quarto 报告（课程推荐）
+- bash
+
 运行
--quarto render report.qmd
--quarto publish gh-pages
---输出结果
---所有图表、报告、结果均保存在 output/ 文件夹中，可直接查看。
+- quarto render report.qmd
+- quarto publish gh-pages
+
+输出结果
+- 所有图表、报告、结果均保存在 output/ 文件夹中，可直接查看。
 ## 4. 结果可视化
 ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point() +
