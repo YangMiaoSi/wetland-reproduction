@@ -1,9 +1,15 @@
 # 土壤特性和沉积物淤积调节恢复湿地甲烷通量的可重复性评估
 ## 项目成员
-杨淼思、王松、高栋
+- 姓名：杨淼思 学号2025303110035 @YangMiaoSi
+- 姓名：高栋 学号2025303120063 @boyfriend-svg
+- 姓名：王松 学号2025303120041 @Wang-source-boop
 
 ## 1. 项目简介
 本项目围绕**湿地甲烷通量、土壤特性、沉积物淤积**开展可重复性验证，完整覆盖**数据预处理 → 数据分析及可视化 → 研究报告**全流程，依托R语言与`renv`环境实现跨设备1:1复现。
+- 论文标题：Soil properties and sediment accretion modulate methane fluxes from restored wetlands
+- 发表期刊/时间：Global Change Biology, 25 March 2018
+- 论文链接：https://onlinelibrary.wiley.com/doi/10.1111/gcb.14124
+- DOI：https://doi.org/10.1111/gcb.14124
 
 ## 2. 运行环境
 - 操作系统：Windows / macOS / Linux
