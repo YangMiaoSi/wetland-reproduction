@@ -62,7 +62,7 @@ renv::restore()
 - 运行 R/data_preprocess.R 进行数据清洗
 - 运行 R/analysis.R 进行统计分析
 - 运行 R/visualization.R 生成图表
-- 生成 Quarto 报告（课程推荐）
+- 生成 Quarto 报告
 - bash
 
 运行
@@ -72,11 +72,14 @@ renv::restore()
 输出结果
 - 所有图表、报告、结果均保存在 output/ 文件夹中，可直接查看。
 ## 4. 结果可视化
+``` r
 ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point() +
   geom_smooth(method = "lm") +
   labs(title = "甲烷通量与土壤特性关系示意图")
+``` 
 ## 5. 项目文件结构
+``` r
 plaintext
 wetland-reproduction/
 ├── R/                  # 数据分析与绘图代码
