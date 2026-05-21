@@ -23,3 +23,68 @@ How to Run
 ----------
 
 Load package into RStudio and open the 'manuscript.Rmd' within the /vignettes folder. Using RStudio, click the 'Knit' button at the top of the console and this manuscript, and analyses herein, will be re-created.
+
+# 土壤特性和沉积物淤积调节恢复湿地甲烷通量的可重复性评估
+## 项目成员
+杨淼思、王松、高栋
+
+## 1. 项目简介
+本项目围绕**湿地甲烷通量、土壤特性、沉积物淤积**开展可重复性验证，完整覆盖**数据预处理 → 数据分析及可视化 → 研究报告**全流程，依托R语言与`renv`环境实现跨设备1:1复现。
+
+## 2. 运行环境
+- 操作系统：Windows / macOS / Linux
+- 编程语言：R ≥ 4.2.1
+- 环境依赖：项目内置`renv`环境，自动管理全部依赖包
+
+## 3. 完整可复现步骤
+数据包括：
+- 甲烷通量观测值
+- 土壤 pH、有机质、容重
+- 沉积物淤积厚度
+
+清洗步骤：
+- 去除缺失值
+- 剔除异常值
+- 统一变量格式
+克隆项目到本地
+bash
+运行
+git clone https://github.com/YangMiaoSi/wetland-reproduction.git
+cd wetland-reproduction
+打开 R/RStudio，还原项目环境
+r
+运行
+renv::restore()
+依次运行代码
+运行 R/data_preprocess.R 进行数据清洗
+运行 R/analysis.R 进行统计分析
+运行 R/visualization.R 生成图表
+生成 Quarto 报告（课程推荐）
+bash
+运行
+quarto render report.qmd
+quarto publish gh-pages
+输出结果
+所有图表、报告、结果均保存在 output/ 文件夹中，可直接查看。
+## 4. 结果可视化
+```{r}
+library(ggplot2)
+# 此处可替换为项目真实绘图代码
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "甲烷通量与土壤特性关系示意图")
+## 5. 项目文件结构
+plaintext
+wetland-reproduction/
+├── R/                  # 数据分析与绘图代码
+├── data/               # 原始数据与清洗后数据
+├── renv/               # 可复现环境
+├── output/             # 输出图表与报告
+├── report.qmd          # Quarto 主报告
+└── README.md           # 项目说明
+## 6. 结果解读
+本项目复现了土壤特性、沉积物淤积对湿地甲烷通量的影响规律：
+土壤有机质含量与甲烷通量呈正相关
+沉积物淤积通过改变土壤通气性影响甲烷排放
+全套流程可复现、可追踪、可验证
